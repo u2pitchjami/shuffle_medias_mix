@@ -254,8 +254,9 @@ for SCENES in "${BASE}"*
             fi
         #NBFICHIERS=$(find $SCENES/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | wc -l)
         NBFICHIERS=$(wc -l ${STATSSCENES}${NOMSCENE}.csv | awk '{print $1-1 " " $2}' | cut -d " " -f1)
-        #NBDOSS=$(cat ${STATSSCENES}${NOMSCENE}.csv | cut -d ";" -f 2 | uniq | wc -l )
-        NBDOSS=$(wc -l ${STATSSCENES}${NOMSCENE}.csv | cut -d ";" -f 2 | uniq | awk '{print $1-1 " " $2}' | cut -d " " -f1 )
+        NBDOSS=$(cat ${STATSSCENES}${NOMSCENE}.csv | tail -n +2 | cut -d ";" -f 2 | uniq | cut -d " " -f1 | wc -l )
+        echo "nbdoss $NBDOSS"
+        #NBDOSS=$(wc -l ${STATSSCENES}${NOMSCENE}.csv | cut -d ";" -f 2 | uniq | awk '{print $1-1 " " $2}' | cut -d " " -f1 )
         DUREETOTALE=$(awk -F';' '{ sum += $6 } END { print sum }' "${STATSSCENES}${NOMSCENE}.csv")
         DUREEMOYENNE=$(expr $DUREETOTALE / $NBFICHIERS )
         echo "${NOMSCENE};${NBFICHIERS};${DUREETOTALE};${DUREEMOYENNE};${NBDOSS}" >> ${STATSSCENES}general.csv
@@ -267,8 +268,7 @@ for SCENES in "${BASE}"*
         NBFICHIERS=$(find $SCENES/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | wc -l)
         NBLIGNESTATS=$(cat "${STATSSCENES}${NOMSCENE}.csv" | wc -l)
         NBLIGNESTATS=$(expr $NBLIGNESTATS - 1 )
-        if [ $NBFICHIERS -eq $NBLIGNESTATS ]
-        then
+        if [ $NBFICHIERS -eq $NBLIGNESTATS ]; then
         echo -e "${GREEN}${BOLD}Fichier OK !!!! ${NC}" | tee -a "${LOGSCHECK}"
         elif [ $NBFICHIERS -gt $NBLIGNESTATS ]
         then

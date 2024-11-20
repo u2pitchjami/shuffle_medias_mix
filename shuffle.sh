@@ -203,8 +203,7 @@ sleep 3
 				then
 				NBFILES1=$(grep -e ";${REPFILTREDOSS};" ${STATSSCENES}${DN2}.csv | grep -e ";${REPFILTRERESO};" | grep -e ";${REPFILTREFPS};" | wc -l)
 				
-				if [ $NBFILES1 -eq "0" ]
-					then
+				if [ $NBFILES1 -eq "0" ]; then
 					NBDIRTEMPLATE=$(grep "^${DN2}" ${STATSSCENES}general.csv | cut -d ";" -f5 )
 					NBFILES1=$(grep "^${DN2}" ${STATSSCENES}general.csv | cut -d ";" -f2 )
 					else

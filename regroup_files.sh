@@ -13,7 +13,7 @@
 #									                                         #
 ############################################################################## 
 source ./.config.cfg
-
+#set -e
 if [ ! -f $RECAP ]
 	then
 	touch $RECAP
@@ -47,6 +47,34 @@ OPTION="normal"
 echo -e "${SAISPAS}${BOLD}Délimiteurs : $DELIM1 $DELIM2 $DELIM3 $DELIM4 $DELIM5${NC}" | tee -a "${LOG}"
 fi
 #############################################################################
+###########################TRAITEMENT DOSSIER ATRIER GENERAL##################################
+echo -e "${SAISPAS}${BOLD}[`date`] - Vérification de la présence de fichiers dans le dossier ATRAITER Général ${NC}" | tee -a "${LOG}"
+NBFILESATRIERGEN=$(find "${DOSSORTGEN}" -type f | wc -l)
+if [[ "$NBFILESATRIERGEN" -gt "0" ]]; then
+    echo -e "${BOLD} ${NBFILESATRIERGEN} fichier(s) à trier ${NC}" | tee -a "${LOG}"
+    for FILEATRIERGEN in "${DOSSORTGEN}"*
+    do
+        #echo "FILEATRIERGEN $FILEATRIERGEN"
+        NOMFILEATRIERGEN=$(echo "$FILEATRIERGEN" | rev | cut -d"/" -f1 | rev)
+        POSDELIMATRIERGEN=$(echo "$FILEATRIERGEN" | rev | cut -d"/" -f1 | rev | awk -v var="$DELIMATRIERGEN" '{print index($0, var)}')
+        POSDELIMATRIERGEN=$(expr $POSDELIMATRIERGEN + 2 )
+        WHATSCENE=$(echo "$FILEATRIERGEN" | rev | cut -d"/" -f1 | rev | cut -c"${POSDELIMATRIERGEN}"- | cut -d "-" -f 1 )
+        WHATSCENEEXIST=$(find "${BASE}" -maxdepth 1 -type d -iname "*-${WHATSCENE}" )
+        if [[ -z "$WHATSCENEEXIST" ]]; then
+            echo -e "${BOLD}${RED}Scene : ${WHATSCENE} inconnu pour le fichier ${NOMFILEATRIERGEN} \n intervention manuelle nécessaire${NC}" | tee -a "${LOG}"
+        else
+            DOSSWHATSCENEEXIST=$(find "${WHATSCENEEXIST}" -maxdepth 1 -type d -iname "${DOSSORT}" )
+            mv "${FILEATRIERGEN}" "${DOSSWHATSCENEEXIST}/${NOMFILEATRIERGEN}"
+        fi
+    done
+    echo -e "${BOLD}Tri terminé !! \n Passons à la suite... ${NC}" | tee -a "${LOG}"
+    echo
+else
+    echo -e "${BOLD}Aucun fichier à trier \n Passons à la suite... ${NC}" | tee -a "${LOG}"
+    echo
+fi
+
+
 
 #Variables pour les stats de fin
 COUNTFILE="0"
@@ -168,8 +196,7 @@ do
                 then
                 echo -e "id $NUMEXIST existant" | tee -a "${LOGREG}"
                 NBFILEEXIST=$(find ${BASE}/* -name "${DOSSORT}" -prune -o -iname "*${NUMEXIST}*" -print | wc -l)
-                if [ $NBFILEEXIST -gt "1" ]
-                    then
+                if [ $NBFILEEXIST -gt "1" ]; then
                     echo -e "${RED}$NBFILEEXIST fichiers avec le même id !!!${NC}" | tee -a "${LOGREG}"
                     echo -e "Je renomme donc celui ci"
                     FILEEXIST=0
@@ -204,7 +231,7 @@ do
             NBCHAR=$(echo "${CREADOSS}" | awk -F "${CHAR}" '{ print (length > 0 ? NF - 1 : 0) }' )
             #NBCHAR=$(awk -v var="$CHAR" '/var/ {count++} END {print count}' "${CREADOSS}")
             #NBCHAR=$(grep -c "${CHAR}" "${CREADOSS}")
-            echo "numchar $NBCHAR"
+            #echo "numchar $NBCHAR"
            
             #######TRAITEMENT DE LA NUMEROTATION#######
             if [ $FILEEXIST -gt "0" ]
@@ -250,9 +277,9 @@ do
                 POSCHAR2=$(expr $POSCHAR + 3 )
                 echo "poschar1-2 $POSCHAR1 - $POSCHAR2"
                 FILE11=$(echo "$FILE" | rev | cut -d"/" -f1 | rev | cut -c1-$POSCHAR1 )
-                echo "file11 $FILE11"
+                #echo "file11 $FILE11"
                 FILE12=$(echo "$FILE" | rev | cut -d"/" -f1 | rev | cut -c$POSCHAR2-$POSDELIM )
-                echo "file12 $FILE12"
+                #echo "file12 $FILE12"
                 CHERCHE1=$(find "${DOSS}"/* -type f -iname "*${FILE11}*" | wc -l)
                 CHERCHE2=$(find "${DOSS}"/* -type f -iname "*${FILE12}*" | wc -l)
                 CREADOSS01=$(echo "$FILE11" | sed -e 's/[^A-Za-z0-9-]/ /g' | tr -s ' ' |  tr '[:upper:]' '[:lower:]')

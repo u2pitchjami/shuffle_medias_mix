@@ -1,0 +1,51 @@
+BASE=/path/to/videos/directory
+DOSSIERTEMPLATE=/path/to/templates/directory
+OUTPUT=/path/to/output/directory
+DATE=$(date +%Y%m%d_%H%M)
+DOSLOG=/path/to/logss/directory
+LOG=${DOSLOG}/${DATE}-Shuffle_Video_Mix
+LOGS=${DOSLOG}/${DATE}-Shuffle-Template
+LOGSCHECK=${DOSLOG}/${DATE}-Shuffle-Check.txt
+LOGREG=${DOSLOG}/${DATE}-Regroup_Files.txt
+MERGE=/path/to/merge/directory
+STATS=/path/to/stas/directory
+STATSSCENES=${STATS}scenes/
+DOSANOMALIES=/path/to/anomalies/directory/
+DOSSORT="name of sort folder"
+RECAP=name and path of recap file
+DELIM1="-0" #delim for Regroup_Files
+DELIM2="_x" #delim for Regroup_Files
+DELIM3='_chf' #delim for Regroup_Files
+DELIM4="_prob" #delim for Regroup_Files
+DELIM5="_new" #delim for Regroup_Files
+DIRSAV_STATS=/path/to/sav stats/directory/
+BACKUP_STATS="$(date +"%Y-%m-%d_%H-%M-%S")_stats-backup"
+RED='\033[0;31m' #code couleur pour les mauvaises réponses
+GREEN='\033[0;32m' #code couleur pour les bonnes réponses
+NC='\033[0m' # No Color 
+BOLD='\033[1m' #code pour mettre en gras le texte
+SAISPAS='\e[1;33;41m' #code pour la couleur d'arrière plan 1;33 pour le jaune, 44 pour le rouge
+
+
+
+if [ ! -d $STATS ]
+	then
+	mkdir $STATS
+fi
+if [ ! -d $STATSSCENES ]
+	then
+	mkdir $STATSSCENES
+fi
+if [ -d ./TEMP ]
+	then
+	rm -r ./TEMP
+fi
+mkdir TEMP
+if [ ! -d $DOSLOG ]
+	then
+	mkdir $DOSLOG
+fi
+if [ ! -d $DIRSAV_STATS ]
+	then
+	mkdir $DIRSAV_STATS
+fi
