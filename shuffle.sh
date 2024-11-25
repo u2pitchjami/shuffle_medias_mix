@@ -248,7 +248,7 @@ sleep 3
 						VIDEO=$(shuf -n 1 "./TEMP/${DN2}TEMP")
 					else
 						NUMALEDN3=$(shuf -i 1-$NBDIRTEMPLATE -n 1)
-						DN4=$(cat ${STATSSCENES}${DN2}.csv | cut -d ";" -f 2 | uniq | head -$NUMALEDN3 | tail +$NUMALEDN3 )
+						DN4=$(cat ${STATSSCENES}${DN2}.csv | cut -d ";" -f 2 | tail +2 | uniq | head -$NUMALEDN3 | tail +$NUMALEDN3 )
 						grep -e ";${DN4};" ${STATSSCENES}${DN2}.csv | cut -d ";" -f9 >> "./TEMP/${DN2}-${DN4}TEMP"
 						VIDEO=$(shuf -n 1 "./TEMP/${DN2}-${DN4}TEMP")
 					fi
@@ -369,6 +369,7 @@ DUREEOUTPUTTOTALMINUTES=$(expr $DUREEOUTPUTTOTAL / 60 )
 if [[ $MERGEOK -eq "1" ]]
 	then
 	echo -e "${BOLD}${SAISPAS}[`date`] - Fichiers compatibles, démarrage de la fusion${NC}" | tee -a "${LOG}"
+	echo -e "${BOLD}${GREEN} $NBFICHIERSOUTPUT fichiers pour une durée de $DUREEOUTPUTTOTALMINUTES minutes${NC}" | tee -a "${LOG}"
 	MERGECOUNT=$(find "$MERGE"/* -type f -iname "${REPONSENOM}*" | wc -l)
 	MERGECOUNT=$(expr $MERGECOUNT + 1 )
 	ffmpeg -f concat -safe 0 -i ./TEMP/TEMPMERGE -c copy "${MERGE}/${REPONSENOM}-${MERGECOUNT}.mp4"

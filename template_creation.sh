@@ -14,8 +14,7 @@
 ############################################################################## 
 
 source ./.config.cfg
-	if [ ! -d $DOSLOG ]
-		then
+	if [ ! -d $DOSLOG ]; then
 		mkdir $DOSLOG
 	fi
 
