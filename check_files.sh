@@ -32,11 +32,11 @@ if [ -d ./TEMP ]
 fi
 mkdir TEMP
 rm ${STATSSCENES}filtre*
-echo | tee -a "${LOG}"
-echo -e "Sauvegarde des stats..." | tee -a "${LOG}"
+echo | tee -a "${LOGSCHECK}"
+echo -e "${TITRE}Sauvegarde des stats...${NC}" | tee -a "${LOGSCHECK}"
 tar -czf ${DIRSAV_STATS}${BACKUP_STATS}.tar.gz ${STATS}
-echo -e "Sauvegarde compressée: \e[32m${BACKUP_STATS}.tar.gz\e[0m\n" | tee -a "${LOG}"
-echo -e "sauvegarde réalisée" | tee -a "${LOG}"
+echo -e "Sauvegarde compressée: \e[32m${BACKUP_STATS}.tar.gz\e[0m\n" | tee -a "${LOGSCHECK}"
+echo -e "${GREEN}sauvegarde réalisée${NC}" | tee -a "${LOGSCHECK}"
 #############################################################################
 ##########################CONTROLE SI OPTION "COMPLET" ACTIVE################
 if [ ! -z $1 ]
@@ -44,14 +44,14 @@ if [ ! -z $1 ]
 	OPTION=$(echo $1 | tr '[:upper:]' '[:lower:]')
 	if [ $OPTION == "complet" ]
 		then
-		echo -e "${SAISPAS}${BOLD}[`date`] - Mode Complet activé${NC}" | tee -a "${LOG}"
+		echo -e "${BIGTITRE}[`date`] - Mode Complet activé${NC}" | tee -a "${LOGSCHECK}"
         rm "$STATSSCENES"*
-        echo -e "${BOLD}[`date`] - Suppression des fichiers stats scenes${NC}" | tee -a "${LOG}"
+        echo -e "${BOLD}${PURPLE}[`date`] - Suppression des fichiers stats scenes${NC}" | tee -a "${LOGSCHECK}"
 	elif [ $OPTION == "stats" ]
         then
-        echo -e "${SAISPAS}${BOLD}[`date`] - Mode Stats activé${NC}" | tee -a "${LOG}"
+        echo -e "${BIGTITRE}[`date`] - Mode Stats activé${NC}" | tee -a "${LOGSCHECK}"
         rm "$STATSSCENES"*
-        echo -e "${BOLD}[`date`] - Réinitialisation des stats sans contrôle des fichiers{NC}" | tee -a "${LOG}"
+        echo -e "${BOLD}[`date`] - Réinitialisation des stats sans contrôle des fichiers{NC}" | tee -a "${LOGSCHECK}"
     else
 		echo "variable inconnue, mode normal activé"
 		OPTION="normal"
@@ -65,11 +65,11 @@ for SCENES in "${BASE}"*
 	do 
     NOMSCENE=$(echo $SCENES | rev | cut -d "/" -f1 | rev )
     XY=0
-    echo -e "${SAISPAS}${BOLD}[`date`] - $NOMSCENE${NC}" | tee -a "${LOGSCHECK}"
+    echo -e "${BIGTITRE}[`date`] - $NOMSCENE${NC}" | tee -a "${LOGSCHECK}"
     if [[ -f ${STATSSCENES}${NOMSCENE}.csv ]]
         then
         ##########################CONTROLE FICHIERS MODIFIES
-        echo -e "Contrôle la présence de fichiers nouveaux ou modifiés" | tee -a "${LOGSCHECK}"
+        echo -e "${BOLD}${TITRE}Contrôle la présence de fichiers nouveaux ou modifiés ${NC}" | tee -a "${LOGSCHECK}"
         cat "${STATSSCENES}${NOMSCENE}.csv" | rev | cut -d";" -f2 | rev | sort -d >> ./TEMP/${NOMSCENE}1
         sed -i "/^fps/d" ./TEMP/${NOMSCENE}1
         sed -i "/^path/d" ./TEMP/${NOMSCENE}1
@@ -77,13 +77,13 @@ for SCENES in "${BASE}"*
         SCENEMODIF=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^<\|>' | wc -l)
         if [[ $SCENEMODIF -ge "1" ]]
             then
-            echo -e "$SCENEMODIF fichiers modifiés" | tee -a "${LOGSCHECK}"
+            echo -e "${BOLD}$SCENEMODIF fichiers modifiés ${NC}" | tee -a "${LOGSCHECK}"
             NBSORTIE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^<' | wc -l)
             NBENTRE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^>' | wc -l)
             ##########################CONTROLE FICHIERS OUT
             if [ $NBSORTIE -ge "1" ]
                 then
-                echo -e "$NBSORTIE fichiers sorties" | tee -a "${LOGSCHECK}" 
+                echo -e "${RED}$NBSORTIE fichiers sorties ${NC}" | tee -a "${LOGSCHECK}" 
                 for ((x=1; x<=$NBSORTIE; x++))
                     do
                     SUPNBSORTIE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^<' | head -$x | tail +$x | rev | cut -d"/" -f1 | rev )
@@ -91,7 +91,7 @@ for SCENES in "${BASE}"*
                     NUMEXIST=$(echo "$SUPNBSORTIE" | rev | cut -d"." -f2 | cut -c1-6 | rev)
                     if [ "$SCENEOUT" -gt "0" ]
                         then
-                        echo "$SUPNBSORTIE Fichier répertorié, suppression des stats en cours"
+                        echo "${PURPLE}$SUPNBSORTIE Fichier répertorié, suppression des stats en cours ${NC}"
                         sed -i "/$NUMEXIST/d" "${STATSSCENES}${NOMSCENE}.csv"
                         SCENEOUT=$(grep -c "^${SUPNBSORTIE}" "${STATSSCENES}${NOMSCENE}.csv" | cut -d ";" -f 1)
                         
@@ -103,14 +103,14 @@ for SCENES in "${BASE}"*
                             
                         fi
                         else
-                        echo "$SUPNBSORTIE Fichier non répertorié, aucune suppression" | tee -a "${LOGSCHECK}"
+                        echo "${RED}$SUPNBSORTIE Fichier non répertorié, aucune suppression ${NC}" | tee -a "${LOGSCHECK}"
                     fi
                     done
             fi    
             ##########################CONTROLE FICHIERS IN
             if [ $NBENTRE -ge "1" ]
                 then
-                echo -e "$NBENTRE nouveaux fichiers" | tee -a "${LOGSCHECK}"
+                echo -e "${GREEN}$NBENTRE nouveaux fichiers ${NC}" | tee -a "${LOGSCHECK}"
                 for ((o=1; o<=$NBENTRE; o++))
                 do
                     NOMENTRE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^>' | cut -c 3- | head -$o | tail +$o)
@@ -119,7 +119,7 @@ for SCENES in "${BASE}"*
                 done
             fi
         else
-            echo -e "[`date`] - Aucun fichier modifié" | tee -a "${LOGSCHECK}"
+            echo -e "${BOLD}[`date`] - Aucun fichier modifié ${NC}" | tee -a "${LOGSCHECK}"
         fi
         echo | tee -a "${LOGSCHECK}"
     fi
@@ -146,13 +146,13 @@ for SCENES in "${BASE}"*
             
             if [[ $OPTION == "complet" || ! -f ${STATSSCENES}${NOMSCENE}.csv ]]
                 then
-                echo -e "[`date`] - Contrôle total de la scène" | tee -a "${LOGSCHECK}"
+                echo -e "${TITRE}[`date`] - Contrôle total de la scène${NC}" | tee -a "${LOGSCHECK}"
                 NBFICHIERS=$(find $SCENES/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | wc -l)
                 else
-                echo -e "Contrôle des fichiers ajoutés à la scène" | tee -a "${LOGSCHECK}"
+                echo -e "${TITRE}Contrôle des fichiers ajoutés à la scène${NC}" | tee -a "${LOGSCHECK}"
                 NBFICHIERS=$(echo $NBENTRE)
             fi
-            echo "nbfichiers $NBFICHIERS"
+            #echo "nbfichiers $NBFICHIERS"
             for ((p=1; p<=NBFICHIERS; p++))
             do
                     if [[ $OPTION == "complet" || ! -f ${STATSSCENES}${NOMSCENE}.csv || $XY -ge "1" ]]
@@ -171,7 +171,7 @@ for SCENES in "${BASE}"*
                 fi
                 NOMFICHIER=$(echo "$NUMFICHIER" | rev | cut -d"/" -f1 | rev)
                 SOUSSCENE=$(echo "$NUMFICHIER" | rev | cut -d"/" -f2 | rev)
-                echo -e "${BOLD}Contrôle du  fichier : "$NOMFICHIER"${NC}" | tee -a "${LOGSCHECK}"
+                echo -e "${PURPLE}Contrôle du  fichier : "$NOMFICHIER"${NC}" | tee -a "${LOGSCHECK}"
                 NUMEXIST=$(echo "$NOMFICHIER" | rev | cut -d"." -f2 | cut -c1-6 | rev)
                 RECAPOK=$(grep -c "^${NUMEXIST}" "${RECAP}" | cut -d ";" -f 1)
                 
@@ -201,7 +201,7 @@ for SCENES in "${BASE}"*
                         MODIFRECAP=$(awk -v var="$NUMEXIST" -F ";" '$1 == var {sub($4, "FAIL"); print}' ${RECAP})
                         sed -i "/^"$NUMEXIST"/d" "${RECAP}"
                         echo "$MODIFRECAP" >> "${RECAP}"
-                        echo "fichier déplacé dans le dossier ANOMALIES" | tee -a "${LOGSCHECK}"
+                        echo -e "${BOLD}fichier déplacé dans le dossier ANOMALIES ${NC}" | tee -a "${LOGSCHECK}"
                         else
                         MODIFRECAP=$(awk -v var="$NUMEXIST" -F ";" '$1 == var {sub($4, "OK"); print}' ${RECAP})
                         sed -i "/^"$NUMEXIST"/d" "${RECAP}"
@@ -213,7 +213,7 @@ for SCENES in "${BASE}"*
                         if [ "$SCENEIN" -gt "0" ]
                             then
                             
-                            echo "Occurence présente dans les stats, remplacement en cours"             
+                            echo -e "${PURPLE}Occurence présente dans les stats, remplacement en cours${NC}"             
                             sed -i "/^'$NOMFICHIER'/d" "${STATSSCENES}${NOMSCENE}.csv"
                             SCENEIN2=$(grep -e "^${NOMFICHIER}" "${STATSSCENES}${NOMSCENE}.csv" | cut -d ";" -f 1)
                             if [ -z $SCENEIN2 ]
@@ -255,16 +255,16 @@ for SCENES in "${BASE}"*
         #NBFICHIERS=$(find $SCENES/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | wc -l)
         NBFICHIERS=$(wc -l ${STATSSCENES}${NOMSCENE}.csv | awk '{print $1-1 " " $2}' | cut -d " " -f1)
         NBDOSS=$(cat ${STATSSCENES}${NOMSCENE}.csv | tail -n +2 | cut -d ";" -f 2 | uniq | cut -d " " -f1 | wc -l )
-        echo "nbdoss $NBDOSS"
+        #echo "nbdoss $NBDOSS"
         #NBDOSS=$(wc -l ${STATSSCENES}${NOMSCENE}.csv | cut -d ";" -f 2 | uniq | awk '{print $1-1 " " $2}' | cut -d " " -f1 )
         DUREETOTALE=$(awk -F';' '{ sum += $6 } END { print sum }' "${STATSSCENES}${NOMSCENE}.csv")
         DUREEMOYENNE=$(expr $DUREETOTALE / $NBFICHIERS )
         echo "${NOMSCENE};${NBFICHIERS};${DUREETOTALE};${DUREEMOYENNE};${NBDOSS}" >> ${STATSSCENES}general.csv
-        echo "Données injectées dans le fichier de stats générales" | tee -a "${LOGSCHECK}"
+        echo -e "${PURPLE}Données injectées dans le fichier de stats générales  ${NC}" | tee -a "${LOGSCHECK}"
 
         
         fi
-        echo -e "Contrôle du fichier stats" | tee -a "${LOGSCHECK}"
+        echo -e "${BLUE}Contrôle du fichier stats ${NC}" | tee -a "${LOGSCHECK}"
         NBFICHIERS=$(find $SCENES/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | wc -l)
         NBLIGNESTATS=$(cat "${STATSSCENES}${NOMSCENE}.csv" | wc -l)
         NBLIGNESTATS=$(expr $NBLIGNESTATS - 1 )
@@ -272,14 +272,14 @@ for SCENES in "${BASE}"*
         echo -e "${GREEN}${BOLD}Fichier OK !!!! ${NC}" | tee -a "${LOGSCHECK}"
         elif [ $NBFICHIERS -gt $NBLIGNESTATS ]
         then
-        echo -e "${GREEN}${RED}ANOMALIE !!! Plus de fichiers que de lignes !!!! ${NC}" | tee -a "${LOGSCHECK}"
+        echo -e "${BOLD}${RED}ANOMALIE !!! Plus de fichiers que de lignes !!!! ${NC}" | tee -a "${LOGSCHECK}"
         elif [ $NBLIGNESTATS -gt $NBFICHIERS ]
         then
-        echo -e "${GREEN}${RED}ANOMALIE !!! Plus de lignes que de fichiers !!!! ${NC}" | tee -a "${LOGSCHECK}"
+        echo -e "${BOLD}${RED}ANOMALIE !!! Plus de lignes que de fichiers !!!! ${NC}" | tee -a "${LOGSCHECK}"
         fi
         echo | tee -a "${LOGSCHECK}"
         
     done
-    echo "[`date`] - C'est fini bisous" | tee -a "${LOGREG}"
+    echo "[`date`] - C'est fini bisous" | tee -a "${LOGSCHECK}"
     
-#rm -r ./TEMP
+rm -r ./TEMP

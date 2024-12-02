@@ -23,30 +23,31 @@ if [ ! -d $DOSLOG ]; then
 fi
 
 echo | tee -a "${LOGREG}"
-echo -e "Sauvegarde des stats..." | tee -a "${LOGREG}"
+echo -e "${TITRE}Sauvegarde des stats...${NC}" | tee -a "${LOGREG}"
 tar -czf ${DIRSAV_STATS}${BACKUP_STATS}.tar.gz ${STATS}
 echo -e "Sauvegarde compressée: \e[32m${BACKUP_STATS}.tar.gz\e[0m\n" | tee -a "${LOGREG}"
-echo -e "sauvegarde réalisée" | tee -a "${LOGREG}"
-
+echo -e "${GREEN}sauvegarde réalisée${NC}" | tee -a "${LOGREG}"
+echo
+echo
 ##########################CONTROLE SI OPTION "NB CARACT" ACTIVE################
 if [ ! -z $1 ]; then
 	OPTION=$(echo $1 | tr '[:upper:]' '[:lower:]')
 	if [[ $OPTION =~ ^[0-9]+$ ]]; then
-		echo -e "${SAISPAS}${BOLD}[`date`] - Mode NB Caractères activé à $OPTION ${NC}" | tee -a "${LOGREG}"
+		echo -e "${BIGTITRE}[`date`] - Mode NB Caractères activé à $OPTION ${NC}" | tee -a "${LOGREG}"
     else
 		echo "variable inconnue, mode normal activé"
-        echo -e "${SAISPAS}${BOLD}[`date`] - variable inconnue, mode normal activé ${NC}" | tee -a "${LOGREG}"
-        echo -e "${SAISPAS}${BOLD}Délimiteurs : $DELIM1 $DELIM2 $DELIM3 $DELIM4 $DELIM5 ${NC}" | tee -a "${LOGREG}"
+        echo -e "${BIGTITRE}[`date`] - variable inconnue, mode normal activé ${NC}" | tee -a "${LOGREG}"
+        echo -e "${BIGTITRE}Délimiteurs : $DELIM1 $DELIM2 $DELIM3 $DELIM4 $DELIM5 ${NC}" | tee -a "${LOGREG}"
 		OPTION="normal"
 	fi
 else
 OPTION="normal"
-echo -e "${SAISPAS}${BOLD}Délimiteurs : $DELIM1 $DELIM2 $DELIM3 $DELIM4 $DELIM5${NC}" | tee -a "${LOGREG}"
+echo -e "${BIGTITRE}Délimiteurs : $DELIM1 $DELIM2 $DELIM3 $DELIM4 $DELIM5${NC}" | tee -a "${LOGREG}"
 fi
 #############################################################################
 
 ###########################TRAITEMENT DOSSIER ATRIER GENERAL##################################
-echo -e "${SAISPAS}${BOLD}[`date`] - Vérification de la présence de fichiers dans le dossier ATRAITER Général ${NC}" | tee -a "${LOGREG}"
+echo -e "${BIGTITRE}[`date`] - Vérification de la présence de fichiers dans le dossier ATRAITER Général ${NC}" | tee -a "${LOGREG}"
 NBFILESATRIERGEN=$(find "${DOSSORTGEN}" -type f | wc -l)
 if [[ "$NBFILESATRIERGEN" -gt "0" ]]; then
     echo -e "${BOLD} ${NBFILESATRIERGEN} fichier(s) à trier ${NC}" | tee -a "${LOGREG}"
@@ -95,7 +96,7 @@ do
     fi
     SCENE=$(echo "$DOSS" | rev | cut -d "/" -f 2 | rev )
     NBFILESDOSS=$(find "${DOSS}" -type f | wc -l 2> /dev/null )
-    echo -e "${SAISPAS}${BOLD}[`date`] - Traitement du dossier $DOSS ${NC}" | tee -a "${LOGREG}"
+    echo -e "${BIGTITRE}[`date`] - Traitement du dossier $DOSS ${NC}" | tee -a "${LOGREG}"
     #echo "dossier de rangement divers $DOSSIER3"
     ###########################TRAITEMENT DES FICHIERS ATRAITER
     if [ $NBFILESDOSS -gt "0" ]; then
