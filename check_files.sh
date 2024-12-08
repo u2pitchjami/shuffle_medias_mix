@@ -12,8 +12,8 @@
 #	BUT: Contrôle intégrité des fichiers + durée                 		     #
 #									                                         #
 ############################################################################## 
-
-source ./.config.cfg
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source ${SCRIPT_DIR}/.config.cfg
 ###########################CONTROLE DOSSIERS##################################
 #contrôle la présence d'un dossier Stats sinon création
 if [ ! -d $STATS ]
@@ -26,11 +26,11 @@ if [ ! -d $DOSLOG ]
 	mkdir $DOSLOG
 fi
 #contrôle la présence d'un dossier TEMP sinon suppression puis création
-if [ -d ./TEMP ]
+if [ -d ${SCRIPT_DIR}/TEMP ]
 	then
-	rm -r ./TEMP
+	rm -r ${SCRIPT_DIR}/TEMP
 fi
-mkdir TEMP
+mkdir ${SCRIPT_DIR}/TEMP
 rm ${STATSSCENES}filtre*
 echo | tee -a "${LOGSCHECK}"
 echo -e "${TITRE}Sauvegarde des stats...${NC}" | tee -a "${LOGSCHECK}"
@@ -70,23 +70,23 @@ for SCENES in "${BASE}"*
         then
         ##########################CONTROLE FICHIERS MODIFIES
         echo -e "${BOLD}${TITRE}Contrôle la présence de fichiers nouveaux ou modifiés ${NC}" | tee -a "${LOGSCHECK}"
-        cat "${STATSSCENES}${NOMSCENE}.csv" | rev | cut -d";" -f2 | rev | sort -d >> ./TEMP/${NOMSCENE}1
-        sed -i "/^fps/d" ./TEMP/${NOMSCENE}1
-        sed -i "/^path/d" ./TEMP/${NOMSCENE}1
-        find "${SCENES}"/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | sort -d >> ./TEMP/${NOMSCENE}2
-        SCENEMODIF=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^<\|>' | wc -l)
+        cat "${STATSSCENES}${NOMSCENE}.csv" | rev | cut -d";" -f2 | rev | sort -d >> ${SCRIPT_DIR}/TEMP/${NOMSCENE}1
+        sed -i "/^fps/d" ${SCRIPT_DIR}/TEMP/${NOMSCENE}1
+        sed -i "/^path/d" ${SCRIPT_DIR}/TEMP/${NOMSCENE}1
+        find "${SCENES}"/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | sort -d >> ${SCRIPT_DIR}/TEMP/${NOMSCENE}2
+        SCENEMODIF=$(diff -biw ${SCRIPT_DIR}/TEMP/${NOMSCENE}1 ${SCRIPT_DIR}/TEMP/${NOMSCENE}2 | grep '^<\|>' | wc -l)
         if [[ $SCENEMODIF -ge "1" ]]
             then
             echo -e "${BOLD}$SCENEMODIF fichiers modifiés ${NC}" | tee -a "${LOGSCHECK}"
-            NBSORTIE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^<' | wc -l)
-            NBENTRE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^>' | wc -l)
+            NBSORTIE=$(diff -biw ${SCRIPT_DIR}/TEMP/${NOMSCENE}1 ${SCRIPT_DIR}/TEMP/${NOMSCENE}2 | grep '^<' | wc -l)
+            NBENTRE=$(diff -biw ${SCRIPT_DIR}/TEMP/${NOMSCENE}1 ${SCRIPT_DIR}/TEMP/${NOMSCENE}2 | grep '^>' | wc -l)
             ##########################CONTROLE FICHIERS OUT
             if [ $NBSORTIE -ge "1" ]
                 then
                 echo -e "${RED}$NBSORTIE fichiers sorties ${NC}" | tee -a "${LOGSCHECK}" 
                 for ((x=1; x<=$NBSORTIE; x++))
                     do
-                    SUPNBSORTIE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^<' | head -$x | tail +$x | rev | cut -d"/" -f1 | rev )
+                    SUPNBSORTIE=$(diff -biw ${SCRIPT_DIR}/TEMP/${NOMSCENE}1 ${SCRIPT_DIR}/TEMP/${NOMSCENE}2 | grep '^<' | head -$x | tail +$x | rev | cut -d"/" -f1 | rev )
                     SCENEOUT=$(grep -c "^${SUPNBSORTIE}" "${STATSSCENES}${NOMSCENE}.csv" | cut -d ";" -f 1)
                     NUMEXIST=$(echo "$SUPNBSORTIE" | rev | cut -d"." -f2 | cut -c1-6 | rev)
                     if [ "$SCENEOUT" -gt "0" ]
@@ -113,8 +113,8 @@ for SCENES in "${BASE}"*
                 echo -e "${GREEN}$NBENTRE nouveaux fichiers ${NC}" | tee -a "${LOGSCHECK}"
                 for ((o=1; o<=$NBENTRE; o++))
                 do
-                    NOMENTRE=$(diff -biw ./TEMP/${NOMSCENE}1 ./TEMP/${NOMSCENE}2 | grep '^>' | cut -c 3- | head -$o | tail +$o)
-                    echo "$NOMENTRE" >> ./TEMP/${NOMSCENE}3
+                    NOMENTRE=$(diff -biw ${SCRIPT_DIR}/TEMP/${NOMSCENE}1 ${SCRIPT_DIR}/TEMP/${NOMSCENE}2 | grep '^>' | cut -c 3- | head -$o | tail +$o)
+                    echo "$NOMENTRE" >> ${SCRIPT_DIR}/TEMP/${NOMSCENE}3
                    
                 done
             fi
@@ -166,7 +166,7 @@ for SCENES in "${BASE}"*
                         NUMFICHIER=$(find $SCENES/* -path $DOSSORT -prune -o -type f -iname "*.mp4" -print | head -$p | tail +$p)
                         #echo "numfichier $NUMFICHIER"
                     else
-                    NOMENTRE=$(cat ./TEMP/${NOMSCENE}3 |  head -$p | tail +$p)
+                    NOMENTRE=$(cat ${SCRIPT_DIR}/TEMP/${NOMSCENE}3 |  head -$p | tail +$p)
                     NUMFICHIER=$(echo "$NOMENTRE")
                 fi
                 NOMFICHIER=$(echo "$NUMFICHIER" | rev | cut -d"/" -f1 | rev)
@@ -282,4 +282,4 @@ for SCENES in "${BASE}"*
     done
     echo "[`date`] - C'est fini bisous" | tee -a "${LOGSCHECK}"
     
-rm -r ./TEMP
+rm -r ${SCRIPT_DIR}/TEMP

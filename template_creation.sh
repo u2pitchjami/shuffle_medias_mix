@@ -13,7 +13,8 @@
 #									                                         #
 ############################################################################## 
 
-source ./.config.cfg
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source ${SCRIPT_DIR}/.config.cfg
 	if [ ! -d $DOSLOG ]; then
 		mkdir $DOSLOG
 	fi

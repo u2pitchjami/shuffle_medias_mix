@@ -12,7 +12,8 @@
 #	BUT: Script de regroupement et renommage de fichiers		             #
 #									                                         #
 ############################################################################## 
-source ./.config.cfg
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source ${SCRIPT_DIR}/.config.cfg
 #set -e
 if [ ! -f $RECAP ];	then
 	touch $RECAP
@@ -88,13 +89,22 @@ NBDOSS=$(find "${BASE}" -mindepth 1 -maxdepth 2 -type d -iname "*trier" | wc -l 
 echo -e "${BOLD}[`date`] - Démarrage du script de classement, $NBDOSS dossiers à checker ${NC}" | tee -a "${LOGREG}"
 for ((o=1; o<=$NBDOSS; o++))
 do
-    DOSS=$(find "${BASE}" -mindepth 1 -maxdepth 2 -type d -iname "*trier" | head -$o | tail +$o | sort -d )
+    DOSS=$(find "${BASE}" -mindepth 1 -maxdepth 2 -type d -iname "*trier" | sort -d | head -$o | tail +$o )
     DOSSIER2=$(dirname "$DOSS")
     DOSSIER3=$(echo "$DOSSIER2/divers")
+    SCENE=$(echo "$DOSS" | rev | cut -d "/" -f 2 | rev )
+
+    NBDOSSVIDES=$(find "${BASE}${SCENE}" -name "${DOSSORT}" -prune -o -type d -empty -print | wc -l)
+    if [ $NBDOSSVIDES -ge "1" ]; then
+        echo -e "${PURPLE}Suppression de $NBDOSSVIDES dossiers vides ${NC}" | tee -a "${LOGREG}"
+        find "${BASE}${SCENE}" -name "${DOSSORT}" -prune -o -type d -empty -print -exec rmdir {} +
+        
+    fi    
+
     if [ ! -d $DOSSIER3 ]; then
    	    mkdir $DOSSIER3
     fi
-    SCENE=$(echo "$DOSS" | rev | cut -d "/" -f 2 | rev )
+   
     NBFILESDOSS=$(find "${DOSS}" -type f | wc -l 2> /dev/null )
     echo -e "${BIGTITRE}[`date`] - Traitement du dossier $DOSS ${NC}" | tee -a "${LOGREG}"
     #echo "dossier de rangement divers $DOSSIER3"
@@ -204,7 +214,7 @@ do
             ###########################PROCESS DE RECHERCHES D'OCCURENCES ET RENOMMAGE DES FICHIERS
             TESTFILE=$(echo "$FILE" | rev | cut -d"/" -f1 | rev | sed -e 's/[^A-Za-z0-9-]/ /g' | cut -c$POSDELIM-$POSDELIM | tr -s ' ' )
             #echo "dernier caractère $TESTFILE"
-            if [[ $TESTFILE == ['!'@#\$%^\&*()_+-] ]]
+            if [[ $TESTFILE == ['!'@#\$%^\&*()_+-' '] ]]
                 then
                 POSDELIM=$(expr $POSDELIM - 1 )
                 #echo "nouvelle position $TESTPOSDIGIT"
@@ -310,7 +320,7 @@ do
                 
                 TESTFILE=$(echo "$FILE" | rev | cut -d"/" -f1 | rev | cut -c$POSDELIM-$POSDELIM | tr -s ' ' )
                 
-                    if [[ $TESTFILE == ['!'@#\$%^\&*()_+-] ]]; then
+                    if [[ $TESTFILE == ['!'@#\$%^\&*()_+-' '] ]]; then
                         POSDELIM=$(expr $POSDELIM - 1 )
                         
                     fi

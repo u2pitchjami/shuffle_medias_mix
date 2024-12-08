@@ -12,8 +12,8 @@
 #	BUT: Script de qui replace les fichiers dans atrier pour regroup         #
 #									                                         #
 ############################################################################## 
-source ./.config.cfg
-#set -e
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source ${SCRIPT_DIR}/.config.cfg
 if [ ! -f $RECAP ];	then
 	touch $RECAP
 	echo "id;nom;scene;control;date;last_change;nbexport" >> $RECAP

@@ -12,8 +12,8 @@
 #	BUT: Script shuffle Videos					                 		     #
 #									                                         #
 ############################################################################## 
-
-source ./.config.cfg
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+source ${SCRIPT_DIR}/.config.cfg
 
 rm -r ${OUTPUT}*
 touch "${LOG}"
@@ -76,31 +76,31 @@ NBMAXMOY=0
 	for ((z=1 ;z<=$NBDIR ;z++))
         do
 		NOMSCENE=$(cat "${REPONSE}" | head -$z | tail +$z | cut -d ";" -f2 | rev | cut -d "/" -f1 | rev)
-        if [[ ! -f ./TEMP/filtre_doss1 ]]
+        if [[ ! -f ${SCRIPT_DIR}/TEMP/filtre_doss1 ]]
             then
-            touch ./TEMP/filtre_doss1
+            touch ${SCRIPT_DIR}/TEMP/filtre_doss1
         fi
-        cat ./TEMP/filtre_doss1 > ./TEMP/filtre_doss2
-        cat ${STATSSCENES}${NOMSCENE}.csv | tail +2 | cut -d ";" -f2 | uniq >> ./TEMP/filtre_doss2
-        cat ./TEMP/filtre_doss2 | sort | uniq > ./TEMP/filtre_doss1
+        cat ${SCRIPT_DIR}/TEMP/filtre_doss1 > ${SCRIPT_DIR}/TEMP/filtre_doss2
+        cat ${STATSSCENES}${NOMSCENE}.csv | tail +2 | cut -d ";" -f2 | uniq >> ${SCRIPT_DIR}/TEMP/filtre_doss2
+        cat ${SCRIPT_DIR}/TEMP/filtre_doss2 | sort | uniq > ${SCRIPT_DIR}/TEMP/filtre_doss1
         
-        if [[ ! -f ./TEMP/filtre_reso1 ]]
+        if [[ ! -f ${SCRIPT_DIR}/TEMP/filtre_reso1 ]]
             then
-            touch ./TEMP/filtre_reso1
+            touch ${SCRIPT_DIR}/TEMP/filtre_reso1
         fi
-        cat ./TEMP/filtre_reso1 > ./TEMP/filtre_reso2
-        cat ${STATSSCENES}${NOMSCENE}.csv | tail +2 | cut -d ";" -f4 | uniq >> ./TEMP/filtre_reso2
-        cat ./TEMP/filtre_reso2 | sort | uniq > ./TEMP/filtre_reso1
-		NBFILTRERESO=$(cat ./TEMP/filtre_reso1 | wc -l)
+        cat ${SCRIPT_DIR}/TEMP/filtre_reso1 > ${SCRIPT_DIR}/TEMP/filtre_reso2
+        cat ${STATSSCENES}${NOMSCENE}.csv | tail +2 | cut -d ";" -f4 | uniq >> ${SCRIPT_DIR}/TEMP/filtre_reso2
+        cat ${SCRIPT_DIR}/TEMP/filtre_reso2 | sort | uniq > ${SCRIPT_DIR}/TEMP/filtre_reso1
+		NBFILTRERESO=$(cat ${SCRIPT_DIR}/TEMP/filtre_reso1 | wc -l)
         
-        if [[ ! -f ./TEMP/filtre_fps1 ]]
+        if [[ ! -f ${SCRIPT_DIR}/TEMP/filtre_fps1 ]]
             then
-            touch ./TEMP/filtre_fps1
+            touch ${SCRIPT_DIR}/TEMP/filtre_fps1
         fi
-        cat ./TEMP/filtre_fps1 > ./TEMP/filtre_fps2
-        cat ${STATSSCENES}${NOMSCENE}.csv | tail +2 | cut -d ";" -f8 | uniq >> ./TEMP/filtre_fps2
-        cat ./TEMP/filtre_fps2 | sort | uniq > ./TEMP/filtre_fps1
-        NBFILTREFPS=$(cat ./TEMP/filtre_fps1 | wc -l)
+        cat ${SCRIPT_DIR}/TEMP/filtre_fps1 > ${SCRIPT_DIR}/TEMP/filtre_fps2
+        cat ${STATSSCENES}${NOMSCENE}.csv | tail +2 | cut -d ";" -f8 | uniq >> ${SCRIPT_DIR}/TEMP/filtre_fps2
+        cat ${SCRIPT_DIR}/TEMP/filtre_fps2 | sort | uniq > ${SCRIPT_DIR}/TEMP/filtre_fps1
+        NBFILTREFPS=$(cat ${SCRIPT_DIR}/TEMP/filtre_fps1 | wc -l)
 	done
 	echo -e "${SAISPAS}${BOLD}Souhaites tu appliquer des filtres sur ce template ? (y ou N) :${NC}"
 	read REPFILTRE
@@ -108,7 +108,7 @@ NBMAXMOY=0
                     if [ $REPFILTRE == "y" ]
                     then
 					echo "nb reso"
-					cat ./TEMP/filtre_reso1 | wc -l
+					cat ${SCRIPT_DIR}/TEMP/filtre_reso1 | wc -l
                     echo -e "${BOLD}Quel dossier ? ${NC} (default: *)"
 					read REPFILTREDOSS
 					REPFILTREDOSS=${REPFILTREDOSS:-*}
@@ -232,28 +232,28 @@ sleep 3
 							then
 							echo "Aucun fichier avec les filtres définis"
 							NBFILES1=$(grep -e ";${REPFILTRERESO};" ${STATSSCENES}${DN2}.csv | grep -e ";${REPFILTREFPS};" | wc -l)
-							grep -e ";${REPFILTRERESO};" ${STATSSCENES}${DN2}.csv | grep -e ";${REPFILTREFPS};" | cut -d ";" -f 9 >> "./TEMP/${DN2}TEMP" 
+							grep -e ";${REPFILTRERESO};" ${STATSSCENES}${DN2}.csv | grep -e ";${REPFILTREFPS};" | cut -d ";" -f 9 >> "${SCRIPT_DIR}/TEMP/${DN2}TEMP" 
 							if [ $NBFILES1 -eq "0" ]
 							then
-							cat ${STATSSCENES}${DN2}.csv | tail +2 | cut -d ";" -f 9 >> "./TEMP/${DN2}TEMP"
+							cat ${STATSSCENES}${DN2}.csv | tail +2 | cut -d ";" -f 9 >> "${SCRIPT_DIR}/TEMP/${DN2}TEMP"
 							fi
 						else
-							grep -e ";${REPFILTREDOSS};" ${STATSSCENES}${DN2}.csv | grep -e ";${REPFILTRERESO};" | grep -e ";${REPFILTREFPS};" | cut -d ";" -f 9 >> "./TEMP/${DN2}TEMP"
+							grep -e ";${REPFILTREDOSS};" ${STATSSCENES}${DN2}.csv | grep -e ";${REPFILTRERESO};" | grep -e ";${REPFILTREFPS};" | cut -d ";" -f 9 >> "${SCRIPT_DIR}/TEMP/${DN2}TEMP"
 						fi
-					VIDEO=$(shuf -n 1 "./TEMP/${DN2}TEMP")	
+					VIDEO=$(shuf -n 1 "${SCRIPT_DIR}/TEMP/${DN2}TEMP")	
 				else
 					if [ "$OPTION" == "all" ]
 						then
-						cat ${STATSSCENES}${DN2}.csv | tail +2 | cut -d ";" -f 9 >> "./TEMP/${DN2}TEMP"
-						VIDEO=$(shuf -n 1 "./TEMP/${DN2}TEMP")
+						cat ${STATSSCENES}${DN2}.csv | tail +2 | cut -d ";" -f 9 >> "${SCRIPT_DIR}/TEMP/${DN2}TEMP"
+						VIDEO=$(shuf -n 1 "${SCRIPT_DIR}/TEMP/${DN2}TEMP")
 					else
 						NUMALEDN3=$(shuf -i 1-$NBDIRTEMPLATE -n 1)
 						DN4=$(cat ${STATSSCENES}${DN2}.csv | cut -d ";" -f 2 | tail +2 | uniq | head -$NUMALEDN3 | tail +$NUMALEDN3 )
-						grep -e ";${DN4};" ${STATSSCENES}${DN2}.csv | cut -d ";" -f9 >> "./TEMP/${DN2}-${DN4}TEMP"
-						VIDEO=$(shuf -n 1 "./TEMP/${DN2}-${DN4}TEMP")
+						grep -e ";${DN4};" ${STATSSCENES}${DN2}.csv | cut -d ";" -f9 >> "${SCRIPT_DIR}/TEMP/${DN2}-${DN4}TEMP"
+						VIDEO=$(shuf -n 1 "${SCRIPT_DIR}/TEMP/${DN2}-${DN4}TEMP")
 					fi
 				fi
-				echo "$VIDEO" >> ./TEMP/TEMP2
+				echo "$VIDEO" >> ${SCRIPT_DIR}/TEMP/TEMP2
 				VIDEONOM=$(echo "$VIDEO" | rev | cut -d "/" -f1 | rev)
 				DOSSSCENE=$(echo "$VIDEO" | rev | cut -d "/" -f2 | rev)
 				echo -e "${BOLD}Source : $DOSSSCENE ${NC}" | tee -a "${LOG}"
@@ -263,7 +263,7 @@ sleep 3
 	done
 echo | tee -a "${LOG}"	
 echo -e "${SAISPAS}[`date`] - ${BOLD}Export des fichiers${NC}" | tee -a "${LOG}"
-NBTOT=$(cat ./TEMP/TEMP2 | wc -l)
+NBTOT=$(cat ${SCRIPT_DIR}/TEMP/TEMP2 | wc -l)
 	for ((d=1; d<=$NBTOT; d++))
 	do
 		#######TRAITEMENT DE LA NUMEROTATION#######
@@ -278,20 +278,20 @@ NBTOT=$(cat ./TEMP/TEMP2 | wc -l)
 			E="$d"
 		fi
 		#######EXPORT DES FICHIERS#######
-		NOMFICHIERORI=$(cat ./TEMP/TEMP2 | head -$d | tail +$d )
-		NOMFICHIEREXPORT=$(cat ./TEMP/TEMP2 | head -$d | tail +$d | rev | cut -d"/" -f1 | rev)
-		NOMSOUSSCENEEXPORT=$(cat ./TEMP/TEMP2 | head -$d | tail +$d | rev | cut -d"/" -f2 | rev)
-		NOMSCENEEXPORT=$(cat ./TEMP/TEMP2 | head -$d | tail +$d | rev | cut -d"/" -f3 | rev)
+		NOMFICHIERORI=$(cat ${SCRIPT_DIR}/TEMP/TEMP2 | head -$d | tail +$d )
+		NOMFICHIEREXPORT=$(cat ${SCRIPT_DIR}/TEMP/TEMP2 | head -$d | tail +$d | rev | cut -d"/" -f1 | rev)
+		NOMSOUSSCENEEXPORT=$(cat ${SCRIPT_DIR}/TEMP/TEMP2 | head -$d | tail +$d | rev | cut -d"/" -f2 | rev)
+		NOMSCENEEXPORT=$(cat ${SCRIPT_DIR}/TEMP/TEMP2 | head -$d | tail +$d | rev | cut -d"/" -f3 | rev)
 		ORISCENE=$(readlink -f "$NOMFICHIERORI")
 		SCENEORI=$(echo "$ORISCENE" | rev | cut -d"/" -f3 | rev)
 		
 		
 		echo "${E}-${NOMSCENEEXPORT}-${NOMFICHIEREXPORT} ..." | tee -a "${LOG}"
-		cat ./TEMP/TEMP2 | head -$d | tail +$d | xargs -I {} cp {} "${OUTPUT}${E}-${NOMSCENEEXPORT}-${NOMFICHIEREXPORT}"
+		cat ${SCRIPT_DIR}/TEMP/TEMP2 | head -$d | tail +$d | xargs -I {} cp {} "${OUTPUT}${E}-${NOMSCENEEXPORT}-${NOMFICHIEREXPORT}"
 		if [[ -f "${OUTPUT}${E}-${NOMSCENEEXPORT}-${NOMFICHIEREXPORT}" ]]
  			then
 			echo -e "${GREEN}Export OK${NC}" | tee -a "${LOG}"
-			echo "file '${OUTPUT}${E}-${NOMSCENEEXPORT}-${NOMFICHIEREXPORT}'" >> ./TEMP/TEMPMERGE
+			echo "file '${OUTPUT}${E}-${NOMSCENEEXPORT}-${NOMFICHIEREXPORT}'" >> ${SCRIPT_DIR}/TEMP/TEMPMERGE
 			if [ -z $MERGEOK ]
 				then
 				COMPARE=$(grep -e "^${NOMFICHIEREXPORT}" ${STATSSCENES}${SCENEORI}.csv | cut -d";" -f3,4,5,8 )
@@ -372,7 +372,7 @@ if [[ $MERGEOK -eq "1" ]]
 	echo -e "${BOLD}${GREEN} $NBFICHIERSOUTPUT fichiers pour une durée de $DUREEOUTPUTTOTALMINUTES minutes${NC}" | tee -a "${LOG}"
 	MERGECOUNT=$(find "$MERGE"/* -type f -iname "${REPONSENOM}*" | wc -l)
 	MERGECOUNT=$(expr $MERGECOUNT + 1 )
-	ffmpeg -f concat -safe 0 -i ./TEMP/TEMPMERGE -c copy "${MERGE}/${REPONSENOM}-${MERGECOUNT}.mp4"
+	ffmpeg -f concat -safe 0 -i ${SCRIPT_DIR}/TEMP/TEMPMERGE -c copy "${MERGE}/${REPONSENOM}-${MERGECOUNT}.mp4"
 	echo
 	echo -e "${BOLD}${GREEN}[`date`] - Fusion terminée de $NBFICHIERSOUTPUT fichiers \n d'une durée de $DUREEOUTPUTTOTALMINUTES minutes${NC}" | tee -a "${LOG}"
 	echo -e "${BOLD}Fichier ${REPONSENOM}-${MERGECOUNT}.mp4 placé dans le dossier Merge... Enjoy ;-)${NC}" | tee -a "${LOG}"
@@ -382,6 +382,6 @@ if [[ $MERGEOK -eq "1" ]]
 	echo -e "${BOLD}$NBFICHIERSOUTPUT fichiers pour une durée totale de $DUREEOUTPUTTOTALMINUTES minutes${NC}" |tee -a "${LOG}"
 	echo -e "Fichiers disponibles dans le dossier Output... ;-)${NC}" | tee -a "${LOG}"
 	fi
-rm -r ./TEMP
+rm -r ${SCRIPT_DIR}/TEMP
 }
 choix_template
