@@ -57,7 +57,7 @@ if [[ "$NBFILESATRIERGEN" -gt "0" ]]; then
         #echo "FILEATRIERGEN $FILEATRIERGEN"
         NOMFILEATRIERGEN=$(echo "$FILEATRIERGEN" | rev | cut -d"/" -f1 | rev )
         POSDELIMATRIERGEN=$(echo "$FILEATRIERGEN" | rev | cut -d"/" -f1 | rev | awk -v var="$DELIMATRIERGEN" '{print index($0, var)}')
-        POSDELIMATRIERGEN=$(expr $POSDELIMATRIERGEN + 2 )
+        POSDELIMATRIERGEN=$(expr $POSDELIMATRIERGEN + 3 )
         WHATSCENE=$(echo "$FILEATRIERGEN" | rev | cut -d"/" -f1 | rev | cut -c"${POSDELIMATRIERGEN}"- | cut -d "-" -f 1 )
         WHATSCENEEXIST=$(find "${BASE}" -maxdepth 1 -type d -iname "*-${WHATSCENE}" )
         if [[ -z "$WHATSCENEEXIST" ]]; then
