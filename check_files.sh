@@ -16,6 +16,11 @@ SCRIPT_DIR=$(dirname "$(realpath "$0")")
 source ${SCRIPT_DIR}/.config.cfg
 ###########################CONTROLE DOSSIERS##################################
 #contrôle la présence d'un dossier Stats sinon création
+if [ -d ${SCRIPT_DIR}/TEMP ]
+	then
+	rm -r ${SCRIPT_DIR}/TEMP
+fi
+mkdir ${SCRIPT_DIR}/TEMP
 if [ ! -d $STATS ]
 	then
 	mkdir $STATS
@@ -32,6 +37,7 @@ if [ -d ${SCRIPT_DIR}/TEMP ]
 fi
 mkdir ${SCRIPT_DIR}/TEMP
 rm ${STATSSCENES}filtre*
+echo "" > $OUTFILES
 echo | tee -a "${LOGSCHECK}"
 echo -e "${TITRE}Sauvegarde des stats...${NC}" | tee -a "${LOGSCHECK}"
 tar -czf ${DIRSAV_STATS}${BACKUP_STATS}.tar.gz ${STATS}
@@ -216,7 +222,7 @@ for SCENES in "${BASE}"*
                             echo -e "${PURPLE}Occurence présente dans les stats, remplacement en cours${NC}"             
                             sed -i "/^'$NOMFICHIER'/d" "${STATSSCENES}${NOMSCENE}.csv"
                             SCENEIN2=$(grep -e "^${NOMFICHIER}" "${STATSSCENES}${NOMSCENE}.csv" | cut -d ";" -f 1)
-                            if [ -z $SCENEIN2 ]
+                            if [ -z "$SCENEIN2" ]
                                 then
                                 echo "${NOMFICHIER};${SOUSSCENE};${DATASTATS};${FPS};${NUMFICHIER};${DATE}" >> "${STATSSCENES}${NOMSCENE}.csv"
                                 echo -e "${GREEN}Remplacement des stats ok ${NC} --> ${DATASTATS};${FPS}" | tee -a "${LOGSCHECK}"
@@ -279,6 +285,21 @@ for SCENES in "${BASE}"*
         fi
         echo | tee -a "${LOGSCHECK}"
         
+        echo -e "${BLUE}Contrôle des fichiers hors standard ${NC}" | tee -a "${LOGSCHECK}"
+        NBLIGNESTATS=$(cat "${STATSSCENES}${NOMSCENE}.csv" | wc -l)
+        NBLIGNESTATS=$(expr $NBLIGNESTATS - 1 )
+        echo $NBLIGNESTATS
+        for ((x=2; x<=$NBLIGNESTATS; x++))
+        do
+            NOMFICHIER=$(cat ${STATSSCENES}${NOMSCENE}.csv | head -$x | tail +$x | cut -d ";" -f9 | rev | cut -d "/" -f1,2,3 | rev )
+            RESOFICHIER=$(cat ${STATSSCENES}${NOMSCENE}.csv | head -$x | tail +$x | cut -d ";" -f4 )
+            FPSFICHIER=$(cat ${STATSSCENES}${NOMSCENE}.csv | head -$x | tail +$x | cut -d ";" -f8 )
+            if [[ $RESOFICHIER != "1920" || $FPSFICHIER != "60" ]]; then
+                echo -e "${BOLD}${RED}ANOMALIE !!! $NOMFICHIER en dehors du standard ${NC}" | tee -a "${LOGSCHECK}"
+                echo ${NOMFICHIER} >> $OUTFILES
+            fi
+        done
+        echo | tee -a "${LOGSCHECK}"
     done
     echo "[`date`] - C'est fini bisous" | tee -a "${LOGSCHECK}"
     
