@@ -16,6 +16,11 @@ SCRIPT_DIR=$(dirname "$(realpath "$0")")
 source ${SCRIPT_DIR}/.config.cfg
 
 rm -r ${OUTPUT}*
+if [ -d ${SCRIPT_DIR}/TEMP ]
+	then
+	rm -r ${SCRIPT_DIR}/TEMP
+fi
+mkdir ${SCRIPT_DIR}/TEMP
 touch "${LOG}"
 echo -e "${BOLD}[`date`] - Démarrage du programme${NC}" | tee -a "${LOG}"
 echo | tee -a "${LOG}"
@@ -107,7 +112,6 @@ NBMAXMOY=0
 	REPFILTRE=${REPFILTRE:-n}
                     if [ $REPFILTRE == "y" ]
                     then
-					echo "nb reso"
 					cat ${SCRIPT_DIR}/TEMP/filtre_reso1 | wc -l
                     echo -e "${BOLD}Quel dossier ? ${NC} (default: *)"
 					read REPFILTREDOSS
