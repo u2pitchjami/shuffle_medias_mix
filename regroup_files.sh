@@ -1,13 +1,13 @@
 #!/bin/bash
 ############################################################################## 
 #                                                                            #
-#	SHELL: !/bin/bash       version 3	                                     #
+#	SHELL: !/bin/bash       version 3.1	                                     #
 #									                                         #
 #	NOM: u2pitchjami						                                 #
 #									                                         #
 #							  					                             #
 #									                                         #
-#	DATE: 30/11/2024	           				                             #
+#	DATE: 13/12/2024	           				                             #
 #									                                         #
 #	BUT: Script de regroupement et renommage de fichiers		             #
 #									                                         #
