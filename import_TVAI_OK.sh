@@ -15,12 +15,12 @@
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 source ${SCRIPT_DIR}/.config.cfg
 
-LOG=${DOSLOG}/${DATE}-import_TVAI_OK.txt
+LOG=${DOSLOG}/${DAY}-import_TVAI_OK.txt
 if [ ! -d $DOSLOG ]
 	then
 	mkdir $DOSLOG
 fi
-touch "$LOG"
+#touch "$LOG"
 
 echo -e "[`date`] - Vérification de la présence de fichiers dans le dossier TVAI_OK" | tee -a "${LOG}"
 NBFILESATRIERGEN=$(find "${DOSSIER_MOUNT}" -type f | wc -l)
